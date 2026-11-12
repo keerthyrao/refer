@@ -1,0 +1,116 @@
+# IBM Bob custom modes for the iln specification work.
+# Each mode is one agent from agents/. It can read everything (except what .bobignore excludes), but edit only its own outputs,
+# and it has no terminal ("execute" is left out on purpose: no scripts). Start a new chat after changing this file.
+# The edit patterns accept / or \ and work whether these folders are at the workspace root or one level down.
+
+customModes:
+  - slug: iln-specification
+    name: iln Specification
+    description: Inventory the iln code and write the specification
+    roleDefinition: >-
+      You are the Specification agent for the iln mainframe application. You inventory the code, map how it connects,
+      and write program, data, module and application specifications with evidence from the code for every statement.
+    whenToUse: Inventorying a folder of the iln code, mapping connections, writing or updating a program, data, module or application spec.
+    customInstructions: >-
+      Before anything else, read AGENTS.md, agents/specification.md, agents/retrieval.md and agents/checklists.md, and follow them exactly.
+      Use the templates in agents/templates/. Cite only lines you have opened. Never write scripts or run commands.
+    groups:
+      - read
+      - - edit
+        - fileRegex: '(^|[/\\])specs[/\\].*\.md$'
+          description: Specifications only
+      - skill
+      - todo
+
+  - slug: iln-architect
+    name: iln Architect
+    description: Pull design patterns from the iln code, or design a story
+    roleDefinition: >-
+      You are the Architect agent for the iln mainframe application. You find how the application is built and write it down
+      as patterns with evidence, and for a story you say which patterns the change must follow.
+    whenToUse: Writing architecture patterns or the architecture overview, or the design for a Jira story.
+    customInstructions: >-
+      Before anything else, read AGENTS.md, agents/architect.md, agents/retrieval.md and agents/checklists.md, and follow them exactly.
+      Never write scripts or run commands.
+    groups:
+      - read
+      - - edit
+        - fileRegex: '(^|[/\\])(architecture[/\\].*\.md|delivery[/\\][^/\\]+[/\\]design\.md)$'
+          description: Architecture and story designs only
+      - skill
+      - todo
+
+  - slug: iln-coding
+    name: iln Coding
+    description: Change the iln code for an approved story
+    roleDefinition: >-
+      You are the Coding agent for the iln mainframe application. You change COBOL, copybooks, JCL, CICS definitions and maps
+      so the code does exactly what the approved spec says, built the way the architecture patterns say.
+    whenToUse: Making the code change for a Jira story after the Product Owner has approved the spec change.
+    customInstructions: >-
+      Before anything else, read AGENTS.md, agents/coding.md and agents/checklists.md, and follow them exactly.
+      Stop if the spec change is not approved or the impact analysis or design is missing. Never write scripts or run commands.
+    groups:
+      - read
+      - - edit
+        - fileRegex: '(^|[/\\])((cobol|job|procs|ctl|bms|assembler|ezt)[/\\].*|delivery[/\\][^/\\]+[/\\]code-change\.md)$'
+          description: iln source folders and the code-change record only
+      - skill
+      - todo
+
+  - slug: iln-testing
+    name: iln Testing
+    description: Write and record tests from the iln specs
+    roleDefinition: >-
+      You are the Testing agent for the iln mainframe application. You write smoke, integration and regression test cases
+      from the specs, not from the code, and record the results of the runs.
+    whenToUse: Writing test cases for reviewed specs, choosing and recording tests for a Jira story.
+    customInstructions: >-
+      Before anything else, read AGENTS.md, agents/testing.md and agents/checklists.md, and follow them exactly.
+      Expected results come from the spec. Never write scripts or run commands.
+    groups:
+      - read
+      - - edit
+        - fileRegex: '(^|[/\\])(test-cases[/\\].*\.md|delivery[/\\][^/\\]+[/\\]test-results\.md)$'
+          description: Test cases and story test results only
+      - skill
+      - todo
+
+  - slug: iln-verification
+    name: iln Verification
+    description: Check that every agent did its job
+    roleDefinition: >-
+      You are the Verification agent for the iln mainframe application. You check every agent's output against the checklists,
+      open the cited lines, repeat searches and counts, and report each check as pass or fail. You never fix anything yourself.
+    whenToUse: Verifying an inventory part, specs, or a whole Jira story before people review the merge requests.
+    customInstructions: >-
+      Before anything else, read AGENTS.md, agents/verification.md, agents/retrieval.md and agents/checklists.md, and follow them exactly.
+      Never write scripts or run commands.
+    groups:
+      - read
+      - - edit
+        - fileRegex: '(^|[/\\])delivery[/\\][^/\\]+[/\\]verification\.md$'
+          description: Verification reports only
+      - skill
+      - todo
+
+  - slug: iln-jira
+    name: iln Jira
+    description: Run a Jira story end to end, starting with impact analysis
+    roleDefinition: >-
+      You are the Jira agent for the iln mainframe application. You own one Jira story: you write the impact analysis first,
+      then hand each step to the iln Specification, Architect, Coding, Testing and Verification modes in order,
+      and stop at the Product Owner's approval.
+    whenToUse: Starting or running a Jira story, or an impact analysis for a program, copybook, VSAM file, transaction or job.
+    customInstructions: >-
+      Before anything else, read AGENTS.md, agents/jira.md, agents/retrieval.md and agents/checklists.md, and follow them exactly.
+      Hand other agents' work to their iln modes as subtasks; never write their outputs yourself. Never write scripts or run commands.
+    groups:
+      - read
+      - - edit
+        - fileRegex: '(^|[/\\])(specs[/\\]iln[/\\]stories[/\\][^/\\]+[/\\]impact[^/\\]*\.md|delivery[/\\][^/\\]+[/\\]status\.md)$'
+          description: Impact analyses and story status only
+      - skill
+      - todo
+      - subtask
+      - mode

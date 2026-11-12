@@ -1,0 +1,96 @@
+# =============================================================================
+# SDD environment register (Story 1.1)
+# Records how the controlled environment is set up. Fill in the TBDs with the
+# GitLab admin / DevOps SME, and keep this file current, since auditors read it.
+# Sections marked "CHANGED (no scripts)" differ from the earlier tooling/config/environment.yaml:
+# if you have edited that file, move it here and copy only those sections across.
+# =============================================================================
+environment: mvp-non-production
+
+gitlab:
+  instance: TBD                         # e.g. https://gitlab.<company>.com
+  group_path: TBD/ILN                   # where the project lives
+  spec_location: TBD                    # CHANGED (no scripts): inside iln, or a separate project (governance/where-it-lives.md) (AC 3)
+  duo_agent_platform:                   # AC 1
+    enabled_for_group: TBD              # yes/no, confirmed by the GitLab admin
+    tier: TBD                           # Premium/Ultimate. Context exclusions and Code Review instructions need Premium+
+    agent_instructions: AGENTS.md       # AC 13 - version controlled, read by Duo and Bob
+    agents: agents/                     # one file per agent: identity, what to do, what not to do, output format
+    chat_rules: .gitlab/duo/chat-rules.md
+    code_review_instructions: .gitlab/duo/mr-review-instructions.yaml   # CHANGED (no scripts): replaces the spec checker
+    skills: .agents/skills/             # CHANGED (no scripts)
+    semantic_code_search: TBD           # CHANGED (no scripts): on/off (beta, GitLab 18.7+), and which projects are indexed
+    context_exclusions: governance/duo-context-exclusions.txt   # AC 9 - paste into Settings > General > GitLab Duo
+  secret_push_protection: TBD           # CHANGED (no scripts): on/off (GitLab Ultimate; Secure > Security configuration)
+  default_branch_protected: true        # main: no direct push, MR + approval only
+  branch_strategy: one branch per Jira feature (fe/<FEATURE-KEY>), pushed per feature; every commit names its Jira story
+
+ibm_bob:                                # CHANGED (no scripts): new section
+  in_use: TBD                           # yes/no, and the Bob version
+  premium_package_for_z: TBD            # yes/no. Its workflows are drafts only (agents/retrieval.md)
+  agent_rules: AGENTS.md                # read automatically (setting bob-code.useAgentRules)
+  modes: .bob/custom_modes.yaml         # one mode per agent, edit limited to its folders, no terminal
+  skills: .bob/skills/
+  ignore_file: .bobignore               # AC 9
+
+source_repositories:                    # AC 2 - legacy source, READ-ONLY for the specification work
+  - name: iln
+    path: TBD                           # GitLab path of the iln repository
+    access: read                        # only the Coding agent changes it, on a feature branch, for a story
+    contents: [cobol, job, procs, ctl, bms, ezt, assembler, test]
+  - name: TBD (CICS CSD extract, if not in ctl/)
+    path: TBD
+    access: read
+    contents: [csd]
+
+identities:                             # AC 5 - CHANGED (no scripts): agents run as the person using Bob or Duo
+  - id: TBD                             # optional: GitLab service account for Duo flows, if the admin sets one up
+    type: service-account
+    purpose: Duo flows
+  - id: TBD
+    type: person
+    role: Agentic Development Engineer  # runs the agents in Bob and Duo; named in generated_by and the commits
+
+permissions:                            # AC 6
+  spec_folders:
+    agentic_engineer: maintainer
+    agent_runs: developer               # can push feature branches, cannot merge to main
+    product_owner: reporter + approver  # approves spec MRs via CODEOWNERS
+    mainframe_sme: reporter + approver
+  legacy_source:
+    agentic_engineer: reporter          # read only, unless the folders live inside iln
+  bob_modes: each agent can edit only its own folders; no mode can run terminal commands
+  merge_rules:
+    - main is protected; merge only via MR
+    - specs/** require Product Owner and Mainframe SME approval (CODEOWNERS)
+    - AGENTS.md, agents/**, .bob/**, .agents/**, .gitlab/duo/** require lead approval (CODEOWNERS)
+
+models:                                 # AC 7 - approved models only
+  approved:
+    - id: TBD                           # model(s) selected for GitLab Duo by the admin
+      use_for: [chat, spec drafting, impact analysis, code review]
+    - id: TBD                           # models provided in IBM Bob under the company's agreement
+      use_for: [spec drafting, impact analysis]
+  rule: Use only models provided through the company's GitLab Duo and IBM Bob set-up. No personal or external AI accounts.
+
+logging:                                # AC 8, 14 - CHANGED (no scripts)
+  output_headers: every output carries generated_by (agent, tool, mode, model, session) and based_on (spec, version, baseline)
+  commits: "<JIRA-KEY> <agent>: <what changed>, with a Generated by line"
+  merge_requests: the Specification and Story templates record the checks done and the approvals
+  gitlab_audit_events: TBD              # confirm with the admin (merges, approvals, setting changes, push-protection skips)
+  tool_history: Duo and Bob session history, as each tool keeps it
+
+production:                             # AC 10
+  access: prohibited
+  rule: No production datasets, regions, credentials or data extracts in these folders or in agent context. Bob modes have no terminal.
+
+non_production_integration_points:      # AC 11 - fill in with DevOps/Mainframe SME
+  - name: TBD                           # e.g. dev LPAR / test CICS region
+    type: TBD
+    used_for: "TBD (later features: build, test, deploy)"
+    access_method: TBD
+    owner: TBD
+
+generated_artifacts:                    # AC 12 - CHANGED (no scripts)
+  rule: Every output built from a spec names it in based_on (spec id, version, baseline tag spec/iln/v<n>.<n> or main commit).
+  baselines: tag main in GitLab (Code > Tags > New tag) after approved specs are merged

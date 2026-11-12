@@ -1,0 +1,17 @@
+# Files and folders GitLab Duo must not read (Story 1.1, AC 9).
+# Paste these into: Project > Settings > General > GitLab Duo > GitLab Duo context exclusions > Manage exclusions
+# Note: GitLab treats exclusions as best-effort for agents (shell commands and grep are not covered),
+# so .bobignore, secret push protection (GitLab Ultimate) and the review checklists back it up.
+**/*.pem
+**/*.key
+**/*.p12
+**/*.jks
+**/.env
+**/*secret*
+**/*password*
+**/*credential*
+**/racf/**
+**/prod-data/**
+**/data-extracts/**
+**/*.dump
+restricted/**

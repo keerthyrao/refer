@@ -1,0 +1,33 @@
+# Story 1.1 AC 6 - who must approve what. Replace the @-placeholders with real GitLab users or groups
+# (they must be members of the project). Turn on "Require approval from code owners" for the protected main branch.
+#
+# Separate specification repository: use this file as .gitlab/CODEOWNERS (keep your own if you already edited it,
+# and replace its old [Tooling] section with the [Governance] section below).
+# Inside iln: add these sections to the end of iln's root CODEOWNERS file instead (see governance/where-it-lives.md).
+
+# Specifications: the Mainframe SME confirms they match the code, the Product Owner approves the business behaviour
+[Specifications][2]
+/specs/                 @product-owner-tbd @mainframe-sme-tbd
+
+# Agent behaviour and the standard (templates, checklists, Bob and Duo configuration): lead approval
+[Agents and standard]
+/AGENTS.md              @lead-tbd
+/agents/                @lead-tbd
+/.bob/                  @lead-tbd
+/.agents/               @lead-tbd
+/.bobignore             @lead-tbd
+/.gitlab/duo/           @lead-tbd
+
+# Architecture patterns: lead and Mainframe SME
+[Architecture]
+/architecture/          @lead-tbd @mainframe-sme-tbd
+
+# Test cases and delivery records
+[Test cases and delivery]
+/test-cases/            @agentic-engineer-tbd
+/delivery/              @agentic-engineer-tbd
+
+# Feature 1 governance: environment register, story documents, review templates
+[Governance]
+/governance/                        @agentic-engineer-tbd @lead-tbd
+/.gitlab/merge_request_templates/   @agentic-engineer-tbd @lead-tbd

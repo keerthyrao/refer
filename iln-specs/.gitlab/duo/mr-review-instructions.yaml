@@ -1,0 +1,54 @@
+# GitLab Duo Code Review: review merge requests against the iln specification standard (agents/checklists.md).
+# Duo applies these as review guidance, not as a hard gate: the Mainframe SME and Product Owner still approve (CODEOWNERS).
+instructions:
+  - name: iln specification standard
+    fileFilters:
+      - "specs/**/*.md"
+      - "!specs/README.md"
+    instructions: |
+      These files are specifications of the iln mainframe application, written from agents/templates/. Check each one and comment on every miss:
+      1. It follows its template (the "type" in the header names it): every section, in order, headings unchanged. No section is empty; "None found" must say where the agent looked.
+      2. No placeholders are left in angle brackets, such as <PROGRAM> or <yyyy-mm-dd>. The header has version (MAJOR.MINOR.PATCH), status, source.commit and generated_by.
+      3. Every business rule has Given, When and Then, plus Evidence, Confidence and Status. Every table row with an Evidence column has evidence written path:line or path:from-to.
+      4. Confidence is confirmed, high, medium or low. Every medium or low item has an open question. Only an SME or the Product Owner makes something confirmed.
+      5. Purpose, business rules, processing flow, state changes and acceptance criteria are in business words: no COBOL data names and no COBOL verbs such as MOVE, PERFORM, COMPUTE or EVALUATE outside brackets, evidence and the glossary.
+      6. Program specs: Restart and recovery is not empty, and Code coverage lists every paragraph of the procedure division with its lines, without gaps.
+      7. Inventory files: in "Folder and coverage", members in the folder equal members listed plus members not listed.
+      8. The version is raised for every change and the change log has a line for the current version with a Jira key.
+      9. Status approved needs a product_owner entry in approvals for this exact version, and no open question still open. Flag any spec an agent set to reviewed or approved.
+      10. Flag anything that looks like a password, key, user id, account or card number, customer data or production data.
+      Where you can, open a few cited lines in the iln code and say whether they support the statement.
+
+  - name: iln agent outputs
+    fileFilters:
+      - "delivery/**/*.md"
+      - "test-cases/**/*.md"
+      - "architecture/**/*.md"
+      - "!delivery/README.md"
+      - "!test-cases/README.md"
+      - "!architecture/README.md"
+    instructions: |
+      These files are outputs of the iln agents, written from agents/templates/. Check each one:
+      1. It follows its template, with no placeholders in angle brackets left and no empty sections.
+      2. The header has generated_by (agent, tool, mode, model, session). Designs, code-change records and test cases also have based_on naming each spec id, version and baseline.
+      3. Test cases take their expected results from the spec, name the spec item they verify, and use made-up data only.
+      4. Test results have evidence for every result; failures are listed, not hidden.
+      5. Architecture patterns have at least three examples from different programs, each with evidence.
+      6. Flag anything that looks like a password, key, user id, account or card number, customer data or production data.
+
+  - name: iln agent instructions
+    fileFilters:
+      - "AGENTS.md"
+      - "agents/**"
+      - "governance/**"
+      - ".bob/**"
+      - ".agents/**"
+      - ".gitlab/duo/**"
+    instructions: |
+      These files tell IBM Bob and GitLab Duo how the iln agents work. Check:
+      1. Nothing asks an agent to write or run scripts or terminal commands.
+      2. Each agent file in agents/ keeps its four parts: Identity, What to do, What not to do, Output format.
+      3. Paths named in the files exist in this repository, and templates named exist in agents/templates/.
+      4. The skills in .agents/skills/ and .bob/skills/ have the same names and the same instructions.
+      5. Each mode in .bob/custom_modes.yaml lets its agent edit only that agent's output folders, and no mode has the execute group.
+      6. No secrets or real data appear in any example.

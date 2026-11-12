@@ -1,0 +1,15 @@
+# Files and folders IBM Bob must not read (Story 1.1, AC 9). Same list as governance/duo-context-exclusions.txt.
+# A direct @ mention of a file bypasses this list, so never mention these files in a prompt.
+**/*.pem
+**/*.key
+**/*.p12
+**/*.jks
+**/.env
+**/*secret*
+**/*password*
+**/*credential*
+**/racf/**
+**/prod-data/**
+**/data-extracts/**
+**/*.dump
+restricted/**
