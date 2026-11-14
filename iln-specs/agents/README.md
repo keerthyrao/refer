@@ -1,113 +1,80 @@
-# Agents
+# iln-specs: Feature 1
 
-Each agent is one Markdown file with four parts:
+Feature 1 understands the `iln` code and extracts its functional specification, using the RAG approach in IBM Bob or GitLab Duo.
+There are no scripts: one agent is one Markdown file, and Bob or Duo does the retrieval and the writing.
 
-| Part | What it says |
+## Files
+
+| File | For |
 |---|---|
-| **Identity** | Who the agent is, what it is responsible for, what it reads |
-| **What to do** | The steps, in order |
-| **What not to do** | Hard limits. Breaking one is a failure, even if the output looks good |
-| **Output format** | Exactly which files it writes, where, and from which template in `agents/templates/` |
+| `AGENTS.md` | The rules every agent follows; Bob and Duo read it automatically |
+| `feature-1/specification.md` | The Feature 1 agent, in the standard sections: agent identity, input contract, probing question rules with the completion trigger, output rules with coverage, format and constraints |
+| `.bob/custom_modes.yaml` | The Bob mode *iln Specification*: it can write only in `specs/functional/` and can't run commands |
+| `.bobignore` | Files Bob must never read; the same list goes into the Duo context exclusions |
+| `.gitlab/CODEOWNERS` | Specs need the Mainframe SME's and Product Owner's approval |
+| `iln-specs.code-workspace` | Opens this repository and the `iln` code together in Bob |
+| `specs/functional/` | The output only: index, inventory, connections, program, data, module and application specs, saved impact answers |
 
-Shared by all of them: `AGENTS.md` (the rules), `retrieval.md` (how to find code), `checklists.md` (the checks before handing over).
+## Set-up (Story 1.1)
 
-## Running an agent
+Tick each item when it is done; together they meet Story 1.1's acceptance criteria.
 
-There are no scripts. The agents run inside the assistants the team already uses, which do the retrieval themselves.
+- [ ] Clone `iln-specs` and `iln` side by side, for example `C:\work\iln-specs` and `C:\work\iln` (AC 2)
+- [ ] `iln-specs` in GitLab: protect `main` so only merge requests change it (AC 3, 6)
+- [ ] Turn on *Require approval from code owners*, and put real names in `.gitlab/CODEOWNERS` (AC 6)
+- [ ] Admin: GitLab Duo on for `iln-specs` and `iln` (AC 1, 2)
+- [ ] Admin: paste the `.bobignore` list into Settings > General > GitLab Duo > *GitLab Duo context exclusions* (AC 9)
+- [ ] Admin: secret push protection on, if you have GitLab Ultimate (AC 9)
+- [ ] Admin: semantic code search on for `iln`, if available (AC 2)
+- [ ] Admin: confirm GitLab audit events are kept for both projects (AC 8)
+- [ ] Bob: **File > Open Workspace from File** > `iln-specs.code-workspace`; the mode *iln Specification* appears (AC 1, 6)
+- [ ] Fill in the record below (AC 5, 7, 11)
 
-| In | How |
-|---|---|
-| **IBM Bob** | Bob reads `AGENTS.md` by itself. Pick the agent's mode (*iln Specification*, *iln Jira* ...; defined in `.bob/custom_modes.yaml`). Each mode reads its agent file and can edit only that agent's folders. Or type a skill as a slash command, for example `/specify-program`. |
-| **GitLab Duo** (Agentic Chat) | Duo reads `AGENTS.md` and `.gitlab/duo/chat-rules.md` by itself. Ask, for example: *"Act as the Specification agent in `agents/specification.md`. Do step A3 for program `<PROGRAM>`."* Duo also uses the skills in `.agents/skills/` when a request matches them. |
-| **GitLab Duo Code Review** | Reviews every merge request against `agents/checklists.md` (`.gitlab/duo/mr-review-instructions.yaml`). |
+### Story 1.1 record
 
-Start a new chat for each program, folder part or story step, so each session's context holds only what that step needs.
+| Item | Value | AC |
+|---|---|---|
+| `iln-specs` project | TBD (GitLab path) | 3 |
+| `iln` project, read access for the people running the agent | TBD | 2 |
+| Who runs the agent (named people; or a Duo service account) | TBD | 5 |
+| Roles: who can push branches, who merges, who approves | TBD | 6 |
+| Approved models: Duo (chosen by the admin) and Bob | TBD | 7 |
+| Production access | None: no production identities, datasets or data | 10 |
+| Non-production integration points (test LPAR, CICS region, test data) | TBD, with DevOps | 11 |
 
-## The agents
+Where the rest of Story 1.1 lives: the agent and its rules are in Git and changed only through approved merge requests (AC 4, 13);
+every file the agent writes records the tool, model and session in its header, and the source commit it read (AC 8, 12, 14);
+every commit names the Jira story (AC 14).
 
-| Agent | File | Job | Writes to |
-|---|---|---|---|
-| Specification | `specification.md` | Inventories the code, maps the connections, and writes the specification: program, then module, then application | `specs/` |
-| Architect | `architect.md` | Pulls the design patterns and architecture out of the code, and says which patterns a story must follow | `architecture/`, `delivery/<JIRA-KEY>/design.md` |
-| Coding | `coding.md` | Changes the code from the approved spec plus the architecture | iln source (feature branch), `delivery/<JIRA-KEY>/code-change.md` |
-| Testing | `testing.md` | Picks and writes smoke, integration and regression tests from the spec, and records results | `test-cases/`, `delivery/<JIRA-KEY>/test-results.md` |
-| Verification | `verification.md` | Checks that every agent did its job, with evidence | `delivery/<JIRA-KEY>/verification.md` |
-| Jira | `jira.md` | Runs one Jira story end to end: impact analysis first, then the other agents in order | `specs/iln/stories/<JIRA-KEY>/`, `delivery/<JIRA-KEY>/status.md` |
+## Running Feature 1
 
-## Two ways the agents are used
+Agree the pilot scope with the lead first; the first request gives it to the agent. Then work on the branch `fe/<FEATURE-KEY>`, in this order.
+Every request names the Jira key and the `iln` commit you are reading (`git -C <your iln folder> log -1 --format=%H`).
+If anything is vague or missing, the agent asks all its questions in one reply before it starts: answer them in one reply too.
 
-**1. Building the baseline (Feature 1).** The Specification agent inventories the code folder by folder, maps the connections,
-then specifies every program, then the modules and the application. The Architect agent pulls the patterns. The Verification agent
-checks each batch. Progress is tracked in `specs/iln/index.md`: Feature 1 is done when every program is specified and reviewed.
+| Order | Request to the agent | Gives |
+|---|---|---|
+| 1 | `Inventory folder <folder>, members <from> to <to>. Jira <JIRA-KEY>. iln commit <id>.` The first time, add `Pilot scope: <folders and ranges>.` Suggested folder order: `ctl`, `job`, `procs`, `cobol` (and its program subfolders), `bms`, `ezt`, `assembler`, `test`; at most 50 members a part | Inventory parts, connections, the program list in `index.md` |
+| 2 | `Specify program <PROGRAM>. Jira <JIRA-KEY>. iln commit <id>.` (repeat per program) | Program and data specs |
+| 3 | `Specify module <module> (transactions or jobs ...). Jira <JIRA-KEY>. iln commit <id>.` | Module specs |
+| 4 | `Specify the application. Jira <JIRA-KEY>. iln commit <id>.` | The application spec |
+| Any time | `What is affected by changing <kind> <NAME>?` (add `Save it. Jira <JIRA-KEY>. iln commit <id>.` to keep it) | An impact answer |
 
-**2. Delivering a Jira story (after the baseline).** The Jira agent runs the chain:
+The build folders (`application-conf`, `pipeline-properties`, `ci-cd`, `change-control`, `simpleLogger`) aren't inventoried; the agent reads
+`application-conf` only for build facts, such as which programs use SQL, CICS or Hogan MQ.
 
-```
-Jira story
-   │
-   ▼
-1. Jira agent ─────────── impact analysis ──────────► specs/iln/stories/<KEY>/impact.md
-   ▼
-2. Specification agent ── update the spec ──────────► specs/... (new version) + stories/<KEY>/spec-change.md
-   ▼
-   ■ GATE: Product Owner approves the spec change (merge request approval)
-   ▼
-3. Architect agent ────── patterns for this story ──► delivery/<KEY>/design.md
-   ▼
-4. Coding agent ───────── code change ──────────────► iln source (feature branch) + delivery/<KEY>/code-change.md
-   ▼
-5. Testing agent ──────── tests and results ────────► test-cases/... + delivery/<KEY>/test-results.md
-   ▼
-6. Verification agent ─── did everyone do their job? ► delivery/<KEY>/verification.md
-   ▼
-   ■ GATE: reviewers approve the merge requests
-```
+After each request: read the completion message, commit with the message it gives, and open a merge request. The SME reviews
+(and sets `status: reviewed`); the Product Owner approves. Progress is in `specs/functional/index.md`.
 
-Every step is a separate commit. Nothing moves to the next step until the previous step's output exists.
+## Feature 1 stories: what meets them and how to show it
 
-## What replaced the scripts
+| Story | Acceptance criteria met by | Definition of Done: how to show it |
+|---|---|---|
+| 1.1 Environment (AC 1 to 14) | The set-up checklist and record above | Take one reviewed program spec: show its merge request (stored), its Git history (versioned), then ask the agent for a module spec or an impact answer that reads it (retrieved and processed), and show the header and commit (traced) |
+| 1.2 Specification standard (AC 15 to 26) | The fixed formats and the completion trigger in `feature-1/specification.md` | The Product Owner picks one small capability; its program, data and module specs are written; the Product Owner explains it from the module spec without COBOL |
+| 1.3 Inventory (AC 27 to 36) | Task A | `index.md` shows every folder in scope inventoried, with counts that add up and unknowns owned |
+| 1.4 Dependency graph (AC 37 to 46) | The connections spec, and task E | Five saved impact answers (a program, a copybook, a VSAM file, a transaction, a job), checked by the SME |
+| 1.5 Business behaviour (AC 47 to 54) | Task B | A program spec the SME has reviewed and the Product Owner has approved, read without COBOL |
 
-| Before (tooling) | Now |
-|---|---|
-| Inventory scanner | Specification agent, step A1: folder by folder, counted (`templates/inventory.md`) |
-| Code index and search | Bob's workspace search and context mentions; Duo's file search and semantic code search (`retrieval.md`) |
-| Dependency graph and impact tool | Connections specs, followed both ways and confirmed by code search (`jira.md`) |
-| Behaviour worklist and coverage | The *Code coverage* section of every program spec, and keyword searches (`specification.md`, A3) |
-| Spec checker | `checklists.md`, applied by the agent, the Verification agent, Duo Code Review and the reviewers |
-| Spec store (release, fetch, verify) | Merge to protected `main` with approvals, then a Git tag; downstream outputs record `based_on` |
-| Run log | `generated_by` in every output header, commit messages, merge requests, GitLab audit events |
-| Secret check and commit hook | Duo context exclusions, `.bobignore`, secret push protection (GitLab Ultimate), the review checklists |
-
-## Commit messages
-
-The agent proposes the message; the person commits.
-
-```
-<JIRA-KEY> <agent>: <what changed>
-
-<why, in one or two lines>
-Spec: <spec id> v<version>          (when a spec is involved)
-Generated by: <Bob or Duo>, <mode>, session <id>
-```
-
-Examples of the first line:
-
-```
-<JIRA-KEY> specification: inventory cobol A-C (48 members, 3 unknowns)
-<JIRA-KEY> jira: impact analysis, 6 programs and 2 copybooks affected
-<JIRA-KEY> specification: <PROGRAM> spec v1.3.0, rule BR-<PROGRAM>-004 changed
-<JIRA-KEY> coding: <PROGRAM> applies rule BR-<PROGRAM>-004
-<JIRA-KEY> testing: 12 regression cases added, 12 passed
-<JIRA-KEY> verification: all checks passed
-```
-
-For the Feature 1 baseline (no story yet), use the Jira key of the Feature 1 story you are working on.
-
-## Confidence levels (used by every agent)
-
-| Level | Meaning |
-|---|---|
-| `confirmed` | A Mainframe SME or the Product Owner has confirmed it |
-| `high` | The code alone proves it, and the evidence is cited |
-| `medium` | Very likely, but depends on something not fully visible (a value set at run time, a program not found) |
-| `low` | An interpretation. Must have an open question |
+Feature 1 is done when every folder in the pilot scope is inventoried, every program in it is specified and reviewed, and its
+module specs and the application spec exist. Version history is Git's history: specs carry no version numbers or change logs.

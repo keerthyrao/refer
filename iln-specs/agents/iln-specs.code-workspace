@@ -1,0 +1,10 @@
+{
+  // Opens this repository and the iln code together, so the agent reads iln and writes the specs here.
+  // Clone both into the same parent folder (C:\work\iln-specs and C:\work\iln), then
+  // File > Open Workspace from File. iln-specs must stay first.
+  "folders": [
+    { "name": "iln-specs", "path": "." },
+    { "name": "iln", "path": "../iln" }
+  ],
+  "settings": {}
+}

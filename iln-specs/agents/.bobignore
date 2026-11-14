@@ -1,0 +1,16 @@
+# Files and folders Bob must never read (Story 1.1, AC 9). Paste the same lines into GitLab:
+# Settings > General > GitLab Duo > GitLab Duo context exclusions.
+# A direct @ mention of a file bypasses this list, so never mention these files in a prompt.
+**/*.pem
+**/*.key
+**/*.p12
+**/*.jks
+**/.env
+**/*secret*
+**/*password*
+**/*credential*
+**/racf/**
+**/prod-data/**
+**/data-extracts/**
+**/*.dump
+restricted/**

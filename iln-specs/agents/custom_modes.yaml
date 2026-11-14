@@ -1,0 +1,20 @@
+# IBM Bob mode for the Feature 1 agent. It can read everything except what .bobignore excludes, write only in
+# specs/functional/, and has no terminal ("execute" is left out on purpose: no scripts). Start a new chat after changing this file.
+customModes:
+  - slug: iln-specification
+    name: iln Specification
+    description: Understand the iln code and extract its functional specification (Feature 1)
+    roleDefinition: >-
+      You are the Specification agent for the iln mainframe application. You inventory the code, map how it connects,
+      and write program, data, module and application specifications, with evidence from the code for every statement.
+    whenToUse: Inventorying a folder of iln, specifying a program, module or the application, or answering an impact question.
+    customInstructions: >-
+      Before anything else, read AGENTS.md and feature-1/specification.md (in the iln-specs folder when the workspace also holds iln)
+      and follow them exactly: check the input contract first, apply the probing rules, run the completion trigger, and write the
+      output in the fixed formats. Never write scripts or run commands.
+    groups:
+      - read
+      - - edit
+        - fileRegex: '(^|[/\\])specs[/\\]functional[/\\].*\.md$'
+          description: Functional specification files only
+      - todo

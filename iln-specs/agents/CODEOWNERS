@@ -1,0 +1,16 @@
+# Who must approve what (Story 1.1, AC 6). Replace the placeholders with real GitLab users or groups,
+# and turn on "Require approval from code owners" for the protected main branch.
+
+# Specifications: the Mainframe SME confirms they match the code, the Product Owner approves the behaviour
+[Specifications][2]
+/specs/                     @product-owner-tbd @mainframe-sme-tbd
+
+# Agents and their settings: lead approval
+[Agents]
+/AGENTS.md                  @lead-tbd
+/feature-1/                 @lead-tbd
+/.bob/                      @lead-tbd
+/.bobignore                 @lead-tbd
+/.gitlab/                   @lead-tbd
+/README.md                  @lead-tbd
+/iln-specs.code-workspace   @lead-tbd
